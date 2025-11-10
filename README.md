@@ -16,7 +16,7 @@ ROS2也使用DDS作为通讯工具，因此adam的底层可以兼容ros2，使�
 
 ROS2 humble的安装可参考: https://docs.ros.org/en/humble/Installation/Ubuntu-Install-Debians.html
 
-ctrl+alt+T打开终端，克隆仓库：https://github.com/pndboticsrobotics/pnd_ros2
+ctrl+alt+T打开终端，克隆仓库：https://github.com/pndbotics/pnd_ros2
 ```bash
 git clone https://github.com/pndbotics/pnd_ros2
 ```
