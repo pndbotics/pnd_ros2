@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.5)
-project(pnd_adam)
+project(adam_u)
 
 # Default to C99
 if(NOT CMAKE_C_STANDARD)
@@ -30,6 +30,8 @@ rosidl_generate_interfaces(${PROJECT_NAME}
 	"msg/LowState.msg"
 	"msg/MotorCmd.msg"
 	"msg/MotorState.msg"
+  "msg/HandCmd.msg"
+	"msg/HandState.msg"
   DEPENDENCIES geometry_msgs
 )
 
