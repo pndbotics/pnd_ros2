@@ -1,67 +1,155 @@
-[TOC]
-# pndbotics 机器人ros2支持
-pndbotics SDK2基于cyclonedds实现了一个易用的机器人数据通信机制，应用开发者可以利用这一接口实现机器人的数据通讯和指令控制。
-ROS2也使用DDS作为通讯工具，因此adam的底层可以兼容ros2，使用ros2自带的  msg 直接进行通讯和控制，而无需通过sdk接口转发。
+# Overview
 
-# 环境配置
-## 系统要求
-测试过的系统和ros2版本
-|系统|ros2 版本|
-|--|--|
-|Ubuntu 22.04|humble (推荐)|
+<div align="center">
 
-## 安装 pndbotics 机器人ros2功能包
+[![Ubuntu](https://img.shields.io/badge/Ubuntu-22.04-E95420?logo=ubuntu&logoColor=white)](https://releases.ubuntu.com/22.04/)
+[![ROS2](https://img.shields.io/badge/ROS2-Humble-22314E?logo=ros&logoColor=white)](https://docs.ros.org/en/humble/index.html)
+[![Middleware](https://img.shields.io/badge/Middleware-CycloneDDS-blue?style=flat)](https://cyclonedds.io/)
+![Updated At](https://img.shields.io/badge/Updated_At-November-64748B?style=flat-square)
+![Version](https://img.shields.io/badge/Version-1.0.0-2563EB?style=flat-square)
+[![License](https://img.shields.io/badge/License-BSD--3--Clause-059669?style=flat-square)](https://opensource.org/licenses/BSD-3-Clause)
 
-以下以ros2 humble为例，如需要其他版本的ros2，在相应的地方替换humble为当前的ros2版本名称即可：
+**Native ROS 2 integration for PNDbotics robots. Leveraging CycloneDDS for direct `msg` communication and control, eliminating the need for intermediate SDK forwarding.**
 
-ROS2 humble的安装可参考: https://docs.ros.org/en/humble/Installation/Ubuntu-Install-Debians.html
+</div>
 
-ctrl+alt+T打开终端，克隆仓库：https://github.com/pndbotics/pnd_ros2
+# 📋 Table of Contents
+
+- [System Requirements](#-system-requirements)
+- [Installation](#-installation)
+  - [Install ROS 2 Humble](#install-ros-2-humble)
+  - [Install PNDbotics Packages](#install-pndbotics-packages)
+- [Contributing](#-contributing)
+- [License](#-license)
+- [Contact](#-contact)
+- [Version Log](#-version-log)
+
+# 💻 System Requirements
+
+Tested environment configuration:
+
+| System | ROS 2 Version |
+| :--- | :--- |
+| **Ubuntu 22.04** | **Humble (Recommended)** |
+
+# 🛠️ Installation
+
+## Install ROS 2 Humble
+
+This documentation uses **ROS2 Humble** as an example. Replace `humble` with another ROS2 version if needed.
+
+### 1. Setup Sources
+
+```bash
+sudo apt install software-properties-common
+sudo add-apt-repository universe
+```
+
+Install ros-apt-source:
+
+```bash
+sudo apt update && sudo apt install curl -y
+export ROS_APT_SOURCE_VERSION=$(curl -s https://api.github.com/repos/ros-infrastructure/ros-apt-source/releases/latest | grep -F "tag_name" | awk -F\" '{print $4}')
+curl -L -o /tmp/ros2-apt-source.deb "https://github.com/ros-infrastructure/ros-apt-source/releases/download/${ROS_APT_SOURCE_VERSION}/ros2-apt-source_${ROS_APT_SOURCE_VERSION}.$(. /etc/os-release && echo ${UBUNTU_CODENAME:-${VERSION_CODENAME}})_all.deb"
+sudo dpkg -i /tmp/ros2-apt-source.deb
+```
+
+### 2. Install ROS2 Packages
+
+```bash
+sudo apt update
+sudo apt upgrade
+sudo apt install ros-humble-desktop
+```
+
+## Install PNDbotics Packages
+
+### 1. Clone pnd_ros2
+
 ```bash
 git clone https://github.com/pndbotics/pnd_ros2
 ```
-其中
-- **cyclonedds_ws** 文件夹为编译和安装 pndbotics 机器人ROS2 msg的工作空间，在子文件夹cyclonedds_ws/pndbotics/pnd_adam中定义了机器人状态获取和控制相关的ros2 msg。
-- **example** 文件夹为 pndbotics 机器人 ROS2 下的相关例程。
 
+Description:
+- `cyclonedds_ws`: workspace for pndbotics ROS2 msg definitions.
+- `example`: ROS2 example programs for pndbotics robots.
 
-## 安装 pndbotics 机器人ros2功能包
-
-### 1. 安装依赖
+### 2. Install Dependencies
 
 ```bash
 sudo apt install ros-humble-rmw-cyclonedds-cpp
 sudo apt install ros-humble-rosidl-generator-dds-idl
 sudo apt install libyaml-cpp-dev
 ```
-### 2. 编译cyclone-dds
-由于 pndbotics 机器人使用的是cyclonedds 0.10.2，因此需要先更改ROS2的dds实现。见：https://docs.ros.org/en/humble/Concepts/About-Different-Middleware-Vendors.html
 
-编译cyclonedds前请确保在启动终端时**没有**自动source ros2相关的环境变量，否则会导致cyclonedds编译报错。如果安装ROS2时在~/.bashrc中添加了 " source /opt/ros/humble/setup.bash "，需要修改 ~/.bashrc 文件将其删除：
+### 3. Build Cyclone DDS
+
+pndbotics robots use **cyclonedds 0.10.2**, so ROS2’s middleware must be switched accordingly.
+Refer to
+Before building, ensure **ROS2 environment variables are NOT auto-sourced**.  
+If `~/.bashrc` contains:
 
 ```bash
-sudo apt install gedit
-sudo gedit ~/.bashrc
-``` 
-在弹出的窗口中，注释掉ros2相关的环境变量，例如：
-```bash
-# source /opt/ros/humble/setup.bash 
+source /opt/ros/humble/setup.bash
 ```
-在终端中执行以下操作编译cyclone-dds
+
+Remove or comment it out:
+
+```bash
+sudo gedit ~/.bashrc
+# comment out ROS2 auto-source
+# source /opt/ros/humble/setup.bash
+```
+
+Build cmd:
+
 ```bash
 cd ~/pnd_ros2/cyclonedds_ws/src
-#克隆cyclonedds仓库
 git clone https://github.com/ros2/rmw_cyclonedds -b humble
-git clone https://github.com/eclipse-cyclonedds/cyclonedds -b releases/0.10.x 
+git clone https://github.com/eclipse-cyclonedds/cyclonedds -b releases/0.10.x
 cd ..
-# 如果编译报错，尝试先运行：`export LD_LIBRARY_PATH=/opt/ros/humble/lib`
-colcon build --packages-select cyclonedds #编译cyclonedds
+colcon build --packages-select cyclonedds
 ```
 
-### 3. 编译功能包
-编译好 cyclone-dds 后就需要 ros2 相关的依赖来完成 pndbotics 功能包的编译，因此编译前需要先 source ROS2 的环境变量。
+## 4. Build ROS2 Packages
 
 ```bash
-source /opt/ros/humble/setup.bash #source ROS2 环境变量
-colcon build #编译工作空间下的所有功能包
+source /opt/ros/humble/setup.bash
+colcon build
 ```
+
+# 🤝 Contributing
+
+Contributions are welcome.
+
+Feel free to open issues or pull requests.
+
+# 📄 License
+
+[BSD-3 Clause © PNDbotics](./LICENSE)
+
+# 📞 Contact
+
+- Email: info@pndbotics.com
+- Wiki: https://wiki.pndbotics.com  
+- SDK: https://github.com/pndbotics/pnd_sdk_python  
+- Issues: https://github.com/pndbotics/pnd_mujoco/issues
+
+# 📜 Version Log
+
+| Version | Date       | Updates                                                                              |
+| ------- | ---------- | ------------------------------------------------------------------------------------ |
+| v1.0.0  | 2025-11-10 | Initial release |
+
+---
+
+<div align="center">
+
+[![Website](https://img.shields.io/badge/Website-PNDbotics-black?)](https://www.pndbotics.com)
+[![Twitter](https://img.shields.io/badge/Twitter-@PNDbotics-1DA1F2?logo=twitter&logoColor=white)](https://x.com/PNDbotics)
+[![YouTube](https://img.shields.io/badge/YouTube-ff0000?style=flat&logo=youtube&logoColor=white)](https://www.youtube.com/@PNDbotics)
+[![Bilibili](https://img.shields.io/badge/-bilibili-ff69b4?style=flat&labelColor=ff69b4&logo=bilibili&logoColor=white)](https://space.bilibili.com/303744535)
+
+**⭐ Star us on GitHub — it helps!**
+
+</div>
