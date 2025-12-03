@@ -91,6 +91,7 @@ If `~/.bashrc` contains:
 
 ```bash
 source /opt/ros/humble/setup.bash
+sudo apt install python3-colcon-common-extensions
 ```
 
 Remove or comment it out:
@@ -108,14 +109,7 @@ cd ~/pnd_ros2/cyclonedds_ws/src
 git clone https://github.com/ros2/rmw_cyclonedds -b humble
 git clone https://github.com/eclipse-cyclonedds/cyclonedds -b releases/0.10.x
 cd ..
-colcon build --packages-select cyclonedds
-```
-
-## 4. Build ROS2 Packages
-
-```bash
-source /opt/ros/humble/setup.bash
-colcon build
+colcon build cyclonedds
 ```
 
 # 🤝 Contributing
