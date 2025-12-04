@@ -19,6 +19,7 @@ jobs:
 
     steps:
       - name: 配置系统环境变量
+        shell: bash
         run: |
           export DEBIAN_FRONTEND=noninteractive
           export TZ=Asia/Shanghai
