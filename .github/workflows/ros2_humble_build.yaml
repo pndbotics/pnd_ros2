@@ -72,8 +72,8 @@ jobs:
 
       - name: 配置 ROS 2 环境
         run: |
-          echo 'source /opt/ros/humble/setup.bash' >> /root/.bashrc
-          source /root/.bashrc
+          echo '. /opt/ros/humble/setup.bash' >> /root/.bashrc
+          . /opt/ros/humble/setup.bash
 
       - name: 克隆代码仓库
         run: |
