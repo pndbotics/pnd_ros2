@@ -32,14 +32,14 @@ jobs:
       - name: 创建工作目录并更新系统
         run: |
           mkdir /workspace
-          apt update -y
+          apt update
           # 安装基础依赖
           apt install -y software-properties-common apt-utils
 
       - name: 添加 Universe 仓库
         run: |
           yes | add-apt-repository universe
-          apt update -y
+          apt update
 
       - name: 安装基础工具并配置时区
         run: |
@@ -63,7 +63,7 @@ jobs:
         run: |
           apt update
           # 安装 ROS 2 Humble 桌面版 + CycloneDDS 相关组件
-          apt install -y \
+          apt install
             ros-humble-desktop \
             ros-humble-rmw-cyclonedds-cpp \
             ros-humble-rosidl-generator-dds-idl \
