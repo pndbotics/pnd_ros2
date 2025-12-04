@@ -3,9 +3,9 @@ name: ROS 2 Humble CycloneDDS Build
 # 触发条件：push/Pull Request 到主分支，或手动触发
 on:
   push:
-    branches: [ main ]
+    branches: [ main, devops ]
   pull_request:
-    branches: [ main ]
+    branches: [ main, devops ]
   workflow_dispatch:
 
 # 配置运行环境
