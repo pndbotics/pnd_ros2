@@ -31,6 +31,7 @@ jobs:
           echo "DEBIAN_FRONTEND=noninteractive" >> $GITHUB_ENV
 
       - name: 创建工作目录并更新系统
+        shell: bash
         run: |
           mkdir /workspace
           apt update
@@ -38,17 +39,20 @@ jobs:
           apt install -y software-properties-common apt-utils
 
       - name: 添加 Universe 仓库
+        shell: bash
         run: |
           yes | add-apt-repository universe
           apt update
 
       - name: 安装基础工具并配置时区
+        shell: bash
         run: |
           apt install -y curl git tzdata
           ln -snf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
           echo "Asia/Shanghai" > /etc/timezone
 
       - name: 安装 ROS 2 apt 源
+        shell: bash
         run: |
           # 容错：如果获取版本失败，使用固定版本（防止 API 限制）
           if [ -z "${{ env.ROS_APT_SOURCE_VERSION }}" ]; then
@@ -61,6 +65,7 @@ jobs:
           dpkg -i /tmp/ros2-apt-source.deb
 
       - name: 安装 ROS 2 Humble 及依赖
+        shell: bash
         run: |
           apt update
           # 安装 ROS 2 Humble 桌面版 + CycloneDDS 相关组件
@@ -72,11 +77,13 @@ jobs:
             python3-colcon-common-extensions
 
       - name: 配置 ROS 2 环境
+        shell: bash
         run: |
-          echo '. /opt/ros/humble/setup.bash' >> /root/.bashrc
-          . /opt/ros/humble/setup.bash
+          echo 'source /opt/ros/humble/setup.bash' >> /root/.bashrc
+          source /opt/ros/humble/setup.bash
 
       - name: 克隆代码仓库
+        shell: bash
         run: |
           git clone https://github.com/pndbotics/pnd_ros2 /workspace/pnd_ros2
           cd /workspace/pnd_ros2/cyclonedds_ws/src
@@ -86,6 +93,7 @@ jobs:
           git clone https://github.com/eclipse-cyclonedds/cyclonedds -b releases/0.10.x
 
       - name: 编译 CycloneDDS 工作空间
+        shell: bash
         run: |
           cd /workspace/pnd_ros2/cyclonedds_ws
           # 加载 ROS 2 环境
@@ -94,6 +102,7 @@ jobs:
           colcon build
 
       - name: 验证编译结果
+        shell: bash
         run: |
           cd /workspace/pnd_ros2/cyclonedds_ws
           source install/setup.bash
