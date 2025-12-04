@@ -57,7 +57,7 @@ jobs:
           curl -L --connect-timeout 10 -o /tmp/ros2-apt-source.deb \
             "https://github.com/ros-infrastructure/ros-apt-source/releases/download/${{ env.ROS_APT_SOURCE_VERSION }}/ros2-apt-source_${{ env.ROS_APT_SOURCE_VERSION }}.$(. /etc/os-release && echo ${UBUNTU_CODENAME:-${VERSION_CODENAME}})_all.deb"
           # 安装 deb 包（忽略依赖警告）
-          dpkg -i /tmp/ros2-apt-source.deb || apt -f install -y
+          dpkg -i /tmp/ros2-apt-source.deb
 
       - name: 安装 ROS 2 Humble 及依赖
         run: |
