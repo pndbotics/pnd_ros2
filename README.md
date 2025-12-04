@@ -55,7 +55,7 @@ git clone https://github.com/ros2/rmw_cyclonedds -b humble
 git clone https://github.com/eclipse-cyclonedds/cyclonedds -b releases/0.10.x 
 cd ..
 # 如果编译报错，尝试先运行：`export LD_LIBRARY_PATH=/opt/ros/humble/lib`
-colcon build --packages-select cyclonedds #编译cyclonedds
+colcon build 
 ```
 
 ### 3. 编译功能包

@@ -3,9 +3,9 @@ name: ROS 2 Humble CycloneDDS Build
 # 触发条件：push/Pull Request 到主分支，或手动触发
 on:
   push:
-    branches: [ main, devops ]
+    branches: [ main ]
   pull_request:
-    branches: [ main, devops ]
+    branches: [ main ]
   workflow_dispatch:
 
 # 配置运行环境
@@ -13,7 +13,7 @@ jobs:
   build:
     runs-on: ubuntu-22.04
     container:
-      # 使用官方 Ubuntu 22.04 容器（可选，也可直接用主机环境）
+      # 使用官方 Ubuntu 22.04 容器
       image: ubuntu:22.04
       options: --user root
 

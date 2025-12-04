@@ -1,14 +1,14 @@
 FROM ubuntu:22.04
 ENV DEBIAN_FRONTEND=noninteractive \
-    TZ=Asia/Shanghai \
-    ROS_APT_SOURCE_VERSION=$(curl -s https://api.github.com/repos/ros-infrastructure/ros-apt-source/releases/latest | grep -F "tag_name" | awk -F\" '{print $4}')
+    TZ=Asia/Shanghai 
 WORKDIR /workspace
 RUN apt update && apt install -y software-properties-common
 RUN yes | add-apt-repository universe
 RUN apt update && \
     apt install -y curl git && \
-    && ln -snf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
-    && echo "Asia/Shanghai" > /etc/timezone
+    ln -snf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime && \
+    echo "Asia/Shanghai" > /etc/timezone && \
+    ROS_APT_SOURCE_VERSION=$(curl -s --connect-timeout 10 https://api.github.com/repos/ros-infrastructure/ros-apt-source/releases/latest | grep -F "tag_name" | awk -F\" '{print $4}') && \
 
 RUN curl -L -o /tmp/ros2-apt-source.deb "https://github.com/ros-infrastructure/ros-apt-source/releases/download/${ROS_APT_SOURCE_VERSION}/ros2-apt-source_${ROS_APT_SOURCE_VERSION}.$(. /etc/os-release && echo ${UBUNTU_CODENAME:-${VERSION_CODENAME}})_all.deb" && \
     dpkg -i /tmp/ros2-apt-source.deb
