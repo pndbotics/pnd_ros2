@@ -54,8 +54,8 @@ jobs:
             ROS_APT_SOURCE_VERSION="1.1.0"
           fi
           # 下载 ros2-apt-source deb 包
-          curl -L --connect-timeout 10 -o /tmp/ros2-apt-source.deb \
-            "https://github.com/ros-infrastructure/ros-apt-source/releases/download/${{ env.ROS_APT_SOURCE_VERSION }}/ros2-apt-source_${{ env.ROS_APT_SOURCE_VERSION }}.$(. /etc/os-release && echo ${UBUNTU_CODENAME:-${VERSION_CODENAME}})_all.deb"
+          curl -L -o /tmp/ros2-apt-source.deb \
+            "https://github.com/ros-infrastructure/ros-apt-source/releases/download/${ROS_APT_SOURCE_VERSION}/ros2-apt-source_${ROS_APT_SOURCE_VERSION}.$(. /etc/os-release && echo ${UBUNTU_CODENAME:-${VERSION_CODENAME}})_all.deb"
           # 安装 deb 包（忽略依赖警告）
           dpkg -i /tmp/ros2-apt-source.deb
 
