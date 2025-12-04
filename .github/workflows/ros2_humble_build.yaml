@@ -61,7 +61,7 @@ jobs:
 
       - name: 安装 ROS 2 Humble 及依赖
         run: |
-          apt update -y
+          apt update
           # 安装 ROS 2 Humble 桌面版 + CycloneDDS 相关组件
           apt install -y \
             ros-humble-desktop \
