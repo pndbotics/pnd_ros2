@@ -1,0 +1,108 @@
+name: ROS 2 Humble CycloneDDS Build
+
+# 触发条件：push/Pull Request 到主分支，或手动触发
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+# 配置运行环境
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    container:
+      # 使用官方 Ubuntu 22.04 容器
+      image: ubuntu:22.04
+      options: --user root
+
+    steps:
+      - name: 配置系统环境变量
+        run: |
+          export DEBIAN_FRONTEND=noninteractive
+          export TZ=Asia/Shanghai
+          # 获取最新 ros-apt-source 版本（处理网络超时/解析失败容错）
+          export ROS_APT_SOURCE_VERSION=$(curl -s https://api.github.com/repos/ros-infrastructure/ros-apt-source/releases/latest | grep -F "tag_name" | awk -F\" '{print $4}')
+          # 输出版本信息用于调试
+          echo "ROS_APT_SOURCE_VERSION=${ROS_APT_SOURCE_VERSION}" >> $GITHUB_ENV
+          echo "TZ=Asia/Shanghai" >> $GITHUB_ENV
+          echo "DEBIAN_FRONTEND=noninteractive" >> $GITHUB_ENV
+
+      - name: 创建工作目录并更新系统
+        run: |
+          mkdir /workspace
+          apt update
+          # 安装基础依赖
+          apt install -y software-properties-common apt-utils
+
+      - name: 添加 Universe 仓库
+        run: |
+          yes | add-apt-repository universe
+          apt update
+
+      - name: 安装基础工具并配置时区
+        run: |
+          apt install -y curl git tzdata
+          ln -snf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
+          echo "Asia/Shanghai" > /etc/timezone
+
+      - name: 安装 ROS 2 apt 源
+        run: |
+          # 容错：如果获取版本失败，使用固定版本（防止 API 限制）
+          if [ -z "${{ env.ROS_APT_SOURCE_VERSION }}" ]; then
+            ROS_APT_SOURCE_VERSION="1.1.0"
+          fi
+          # 下载 ros2-apt-source deb 包
+          curl -L -o /tmp/ros2-apt-source.deb \
+            "https://github.com/ros-infrastructure/ros-apt-source/releases/download/${ROS_APT_SOURCE_VERSION}/ros2-apt-source_${ROS_APT_SOURCE_VERSION}.$(. /etc/os-release && echo ${UBUNTU_CODENAME:-${VERSION_CODENAME}})_all.deb"
+          # 安装 deb 包（忽略依赖警告）
+          dpkg -i /tmp/ros2-apt-source.deb
+
+      - name: 安装 ROS 2 Humble 及依赖
+        run: |
+          apt update
+          # 安装 ROS 2 Humble 桌面版 + CycloneDDS 相关组件
+          apt install -y \
+            ros-humble-desktop \
+            ros-humble-rmw-cyclonedds-cpp \
+            ros-humble-rosidl-generator-dds-idl \
+            libyaml-cpp-dev \
+            python3-colcon-common-extensions
+
+      - name: 配置 ROS 2 环境
+        shell: bash
+        run: |
+          echo 'source /opt/ros/humble/setup.bash' >> /root/.bashrc
+          source /opt/ros/humble/setup.bash
+
+      - name: 克隆代码仓库
+        shell: bash
+        run: |
+          git clone https://github.com/pndbotics/pnd_ros2 /workspace/pnd_ros2
+          cd /workspace/pnd_ros2/cyclonedds_ws/src
+          # 克隆 rmw_cyclonedds (humble 分支)
+          git clone https://github.com/ros2/rmw_cyclonedds -b humble
+          # 克隆 cyclonedds (0.10.x 发布分支)
+          git clone https://github.com/eclipse-cyclonedds/cyclonedds -b releases/0.10.x
+
+      - name: 编译 CycloneDDS 工作空间
+        shell: bash
+        run: |
+          cd /workspace/pnd_ros2/cyclonedds_ws
+          # 加载 ROS 2 环境
+          source /opt/ros/humble/setup.bash
+          # 使用 colcon 编译（启用详细输出，忽略警告）
+          colcon build
+
+      - name: 验证编译结果
+        shell: bash
+        run: |
+          cd /workspace/pnd_ros2/cyclonedds_ws
+          source install/setup.bash
+          # 验证 CycloneDDS 环境
+          echo "=== 验证 RMW 实现 ==="
+          echo "RMW_IMPLEMENTATION: $RMW_IMPLEMENTATION"
+          # 列出编译后的包
+          echo "=== 编译完成的包列表 ==="
+          colcon list

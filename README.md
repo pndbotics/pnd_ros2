@@ -109,7 +109,8 @@ cd ~/pnd_ros2/cyclonedds_ws/src
 git clone https://github.com/ros2/rmw_cyclonedds -b humble
 git clone https://github.com/eclipse-cyclonedds/cyclonedds -b releases/0.10.x
 cd ..
-colcon build cyclonedds
+# 如果编译报错，尝试先运行：`export LD_LIBRARY_PATH=/opt/ros/humble/lib`
+colcon build
 ```
 
 # 🤝 Contributing
