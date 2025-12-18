@@ -1,2 +1,2 @@
-MotorCmd[19] motor_cmd
+MotorCmd[] motor_cmd
 uint32 reserve

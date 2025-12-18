@@ -1,2 +1,3 @@
-MotorState[19] motor_state
+MotorState[] motor_state
+int16[40] wireless_remote
 uint32 reserve
