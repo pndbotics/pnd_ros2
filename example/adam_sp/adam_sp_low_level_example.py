@@ -10,7 +10,7 @@ from pnd_adam.msg import LowCmd, LowState, MotorCmd, MotorState, HandCmd
 
 import numpy as np
 
-ADAM_PRO_NUM_MOTOR = 31
+ADAM_SP_NUM_MOTOR = 29
 
 
 Kp = [
@@ -18,8 +18,7 @@ Kp = [
     305.0, 700.0, 405.0, 305.0, 30.0, 0.0,      # Right leg: hipPitch, hipRoll, hipYaw, kneePitch, anklePitch, ankleRoll
     205.0, 405.0, 405.0,                        # Waist: waistYaw, waistRoll, waistPitch
     18.0, 9.0, 9.0, 9.0, 9.0, 9.0, 9.0,         # Left arm: shoulderPitch, shoulderRoll, shoulderYaw, elbow, wristYaw, wristPitch, wristRoll
-    18.0, 9.0, 9.0, 9.0, 9.0, 9.0, 9.0,         # Right arm: shoulderPitch, shoulderRoll, shoulderYaw, elbow, wristYaw, wristPitch, wristRoll
-    40.0,40.0                                       # head: head_pitch, head_yaw
+    18.0, 9.0, 9.0, 9.0, 9.0, 9.0, 9.0          # Right arm: shoulderPitch, shoulderRoll, shoulderYaw, elbow, wristYaw, wristPitch, wristRoll
 ]
 
 Kd = [
@@ -27,8 +26,7 @@ Kd = [
     6.1, 30.0, 6.1, 6.1, 2.25, 0.25,     # Right leg: hipPitch, hipRoll, hipYaw, kneePitch, anklePitch, ankleRoll
     4.1, 6.1, 6.1,                       # Waist: waistYaw, waistRoll, waistPitch
     0.9, 0.9, 0.9, 0.9, 0.9, 0.9, 0.9,   # Left arm: shoulderPitch, shoulderRoll, shoulderYaw, elbow, wristYaw, wristPitch, wristRoll
-    0.9, 0.9, 0.9, 0.9, 0.9, 0.9, 0.9,
-    1.0, 1.0                                              # head: head_pitch, head_yaw
+    0.9, 0.9, 0.9, 0.9, 0.9, 0.9, 0.9
 ]
 
 class ADAMJointIndex:
@@ -60,9 +58,7 @@ class ADAMJointIndex:
     RightElbow = 25
     RightWristRoll = 26
     RightWristPitch = 27  
-    RightWristYaw = 28
-    HeadYaw = 29   
-    HeadPitch = 30  
+    RightWristYaw = 28    
 
 
 class DemonController(Node):
@@ -81,11 +77,11 @@ class DemonController(Node):
         self.mutex = threading.Lock()
         
         self.low_state = LowState()
-        self.low_state.motor_state = [MotorState() for _ in range(ADAM_PRO_NUM_MOTOR)]
+        self.low_state.motor_state = [MotorState() for _ in range(ADAM_SP_NUM_MOTOR)]
         # print("init len(low_state.motor_state)=", len(self.low_state.motor_state))
 
         self.low_cmd = LowCmd()
-        self.low_cmd.motor_cmd = [MotorCmd() for _ in range(ADAM_PRO_NUM_MOTOR)]
+        self.low_cmd.motor_cmd = [MotorCmd() for _ in range(ADAM_SP_NUM_MOTOR)]
         self.hand_cmd = HandCmd()
 
         self.close_hand = np.array([500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500], dtype=int)
@@ -103,11 +99,11 @@ class DemonController(Node):
         # 获取实际接收到的电机数量
         received_len = len(msg.motor_state)
         
-        if received_len < ADAM_PRO_NUM_MOTOR:
+        if received_len < ADAM_SP_NUM_MOTOR:
             # 如果收到的数据不足，先复制已有的数据
             self.low_state = msg
             # 计算缺失的数量
-            missing_count = ADAM_PRO_NUM_MOTOR - received_len
+            missing_count = ADAM_SP_NUM_MOTOR - received_len
             # 用默认的 MotorState 对象补齐列表
             # 这样 self.low_state.motor_state[i].q 就会默认为 0.0
             self.low_state.motor_state.extend([MotorState() for _ in range(missing_count)])
@@ -130,7 +126,7 @@ class DemonController(Node):
             
             if self.time_ < self.duration_ :
                 # [Stage 1]: set robot to zero posture
-                for i in range(ADAM_PRO_NUM_MOTOR):
+                for i in range(ADAM_SP_NUM_MOTOR):
                     ratio = np.clip(self.time_ / self.duration_, 0.0, 1.0)
                     self.low_cmd.motor_cmd[i].mode =  1 # 1:Enable, 0:Disable
                     self.low_cmd.motor_cmd[i].tau = 0. 
@@ -156,7 +152,7 @@ class DemonController(Node):
                 self.low_cmd.motor_cmd[ADAMJointIndex.RightAnkleRoll].q = R_R_des
 
             elif self.time_ < self.duration_ * 3 :
-                for i in range(ADAM_PRO_NUM_MOTOR):
+                for i in range(ADAM_SP_NUM_MOTOR):
                     self.low_cmd.motor_cmd[i].mode =  1 # 1:Enable, 0:Disable
                     self.low_cmd.motor_cmd[i].tau = 0. 
                     self.low_cmd.motor_cmd[i].q = 0.
@@ -179,5 +175,5 @@ def main(args=None):
     rclpy.shutdown()
 
 if __name__ == '__main__':
-    input("Demo adam Lite robot movement by ROS2. Press enter to start")
+    input("Demo adam SP robot movement by ROS2. Press enter to start")
     main()
