@@ -139,5 +139,5 @@ def main(args=None):
     rclpy.shutdown()
 
 if __name__ == '__main__':
-    input("Demo adam Pro robot movement by ROS2. Press enter to start")
+    input("Demo adam U robot movement by ROS2. Press enter to start")
     main()
