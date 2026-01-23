@@ -134,6 +134,7 @@ Feel free to open issues or pull requests.
 
 | Version | Date       | Updates                                                                              |
 | ------- | ---------- | ------------------------------------------------------------------------------------ |
+| v1.2.0  | 2026-01-22 | DDS refactoring version |
 | v1.0.0  | 2025-11-10 | Initial release |
 
 ---
