@@ -4,4 +4,5 @@ float32 dq
 float32 tau
 float32 kp
 float32 kd
+float32 ki
 uint32 reserve

@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <?xml-model href=""?>
 <package format="3">
-  <name>adam_u</name>
+  <name>pnd_adam</name>
   <version>0.0.0</version>
   <description>TODO: Package description</description>
   <maintainer email="info@pndbotics.com">PNDBotics</maintainer>
