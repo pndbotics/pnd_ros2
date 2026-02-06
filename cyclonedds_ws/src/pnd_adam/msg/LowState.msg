@@ -1,3 +1,4 @@
+uint8 mode_pr
 uint32 tick
 IMUState imu_state
 MotorState[] motor_state
