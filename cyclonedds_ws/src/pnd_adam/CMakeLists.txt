@@ -33,6 +33,7 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   "msg/HandCmd.msg"
 	"msg/HandState.msg"
   "msg/IMUState.msg"
+  "msg/BatteryData.msg"
   DEPENDENCIES geometry_msgs
 )
 
